@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:15
+    container_name: tron_db
+    ports:
+      - "15432:5432"
+    env_file:
+      - docker.env
+    volumes:
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  tron_app:
+    build:
+      context: .
+    container_name: tron_app
+    env_file:
+      - docker.env
+    depends_on:
+      - db
+    command: >
+      bash -c "
+        alembic upgrade head &&
+        uvicorn app.main:app --host=0.0.0.0 --port=8000
+      "
+    ports:
+      - 8001:8000
