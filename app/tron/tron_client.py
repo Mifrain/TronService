@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from fastapi import HTTPException
+
 from tronpy import Tron
 from tronpy.providers import HTTPProvider
 
@@ -24,4 +26,6 @@ async def get_account_info(address: str) -> TronInfoSchema:
         )
 
     except Exception as e:
-        raise RuntimeError(f"Failed to get info for address {address}: {str(e)}")
+        raise HTTPException(status_code=400, detail="Неверный TRON адрес")
+
+    

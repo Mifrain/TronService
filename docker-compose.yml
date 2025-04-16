@@ -8,6 +8,11 @@ services:
       - docker.env
     volumes:
       - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 5s
+      retries: 5
 
   tron_app:
     build:
@@ -16,7 +21,8 @@ services:
     env_file:
       - docker.env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     command: >
       bash -c "
         alembic upgrade head &&
